@@ -6,9 +6,12 @@
 #include <d3dcompiler.h>
 #include <directxmath.h>
 #include <directxcolors.h>
+#include <Model.h>
+#include <SDKMesh.h>
 #include "DDSTextureLoader.h"
 #include "resource.h"
 #include "WindowsProject2.h"
+
 #define MAX_LOADSTRING 100
 
 
@@ -68,6 +71,16 @@ XMMATRIX                            g_World;
 XMMATRIX                            g_View;
 XMMATRIX                            g_Projection;
 XMFLOAT4                            g_vMeshColor(0.7f, 0.7f, 0.7f, 1.0f);
+
+Model m_model;
+std::shared_ptr<IEffectFactory> g_effectFactory;
+
+
+std::wstring meshFilePath = L"Media\\tiny.sdkmesh";
+std::wstring matFilePath = L"Media\\tiny.sdkmesh";
+
+
+
 
 //--------------------------------------------------------------------------------------
 // Forward declarations
@@ -409,7 +422,8 @@ HRESULT InitDevice()
     D3D11_INPUT_ELEMENT_DESC layout[] =
     {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0},
+        {"NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0},
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,0,24,D3D11_INPUT_PER_VERTEX_DATA,0},
     };
     UINT numElements = ARRAYSIZE(layout);
 
@@ -421,6 +435,17 @@ HRESULT InitDevice()
 
     //input layout 설정
     g_pImmediateContext->IASetInputLayout(g_pVertexLayout);
+
+
+    //effectfactory 설정
+    g_effectFactory = std::make_shared<IEffectFactory>(g_pd3dDevice);
+
+    //mesh 불러오기
+    m_model.CreateFromSDKMESH(g_pd3dDevice, meshFilePath.c_str(), *g_effectFactory);
+
+
+   
+
 
     //pixel shader 컴파일
     ID3DBlob* pPSBlob = nullptr;
@@ -582,7 +607,7 @@ HRESULT InitDevice()
     cbChangesOnResize.mProjection = XMMatrixTranspose(g_Projection);
     g_pImmediateContext->UpdateSubresource(g_pCBChangeOnResize, 0, nullptr, &cbChangesOnResize, 0, 0);
 
-
+    
     return S_OK;
 }
 

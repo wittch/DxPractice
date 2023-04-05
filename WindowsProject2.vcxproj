@@ -92,6 +92,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FloatingPointModel>Fast</FloatingPointModel>
       <OpenMPSupport>false</OpenMPSupport>
+      <AdditionalIncludeDirectories>$(DXSDK_DIR)Include;D:\DxSample\DirectXTK\Inc;D:\DxSample\DirectXTK\Src;D:\DxSample\DirectXTK\Tools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -100,6 +101,7 @@
       <LargeAddressAware>true</LargeAddressAware>
       <AdditionalOptions> %(AdditionalOptions)</AdditionalOptions>
       <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(DXSDK_DIR)Lib\x64;D:\DxSample\DirectXTK\Src;D:\DxSample\DirectXTK\Inc;D:\DxSample\DirectXTK\Tools;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -128,6 +130,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FloatingPointModel>Fast</FloatingPointModel>
       <OpenMPSupport>false</OpenMPSupport>
+      <AdditionalIncludeDirectories>$(DXSDK_DIR)Include;D:\DxSample\DirectXTK\Inc;D:\DxSample\DirectXTK\Src;D:\DxSample\DirectXTK\Tools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -136,6 +139,7 @@
       <LargeAddressAware>true</LargeAddressAware>
       <AdditionalOptions> %(AdditionalOptions)</AdditionalOptions>
       <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(DXSDK_DIR)Lib\x64;D:\DxSample\DirectXTK\Src;D:\DxSample\DirectXTK\Inc;D:\DxSample\DirectXTK\Tools;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
