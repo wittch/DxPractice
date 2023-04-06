@@ -30,15 +30,9 @@
     <ClInclude Include="WindowsProject2.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="DDSTextureLoader.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Wndmain.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="DDSTextureLoader.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -57,6 +51,9 @@
     <Image Include="seafloor.dds">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="cup.jpg">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
@@ -70,5 +67,8 @@
     <None Include="TutorialFX.fxh">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="cup._obj" />
+    <None Include="cup.mtl" />
+    <None Include="cup.cmo" />
   </ItemGroup>
 </Project>
