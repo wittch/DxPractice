@@ -158,12 +158,12 @@ HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow)
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
         CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance,
         nullptr);
-   
+
     if (!g_hWnd)
         return E_FAIL;
-    
+
     ShowWindow(g_hWnd, nCmdShow);
-    
+
     return S_OK;
 }
 
@@ -171,14 +171,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
-    
+
     case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
-            EndPaint(hWnd, &ps);
-        }
-        break;
+    {
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hWnd, &ps);
+        EndPaint(hWnd, &ps);
+    }
+    break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
@@ -261,12 +261,12 @@ HRESULT InitDevice()
     {
         g_driverType = driverTypes[driverTypeIndex];
         hr = D3D11CreateDevice(nullptr, g_driverType, nullptr, createDeviceFlags, featureLevels, numFeatureLevels,
-                               D3D11_SDK_VERSION, &g_pd3dDevice, &g_featureLevel, &g_pImmediateContext);
+            D3D11_SDK_VERSION, &g_pd3dDevice, &g_featureLevel, &g_pImmediateContext);
         if (hr == E_INVALIDARG)
         {
             //DirectX 11.0 플랫폼이 D3D_FEATURE_LEVEL_11_1 을 인지하지 못할때 재시도
             hr = D3D11CreateDevice(nullptr, g_driverType, nullptr, createDeviceFlags, &featureLevels[1], numFeatureLevels - 1,
-                                   D3D11_SDK_VERSION, &g_pd3dDevice, &g_featureLevel, &g_pImmediateContext);
+                D3D11_SDK_VERSION, &g_pd3dDevice, &g_featureLevel, &g_pImmediateContext);
         }
 
         if (SUCCEEDED(hr))
@@ -290,11 +290,11 @@ HRESULT InitDevice()
                 adapter->Release();
             }
             dxgiDevice->Release();
-        }   
+        }
     }
     if (FAILED(hr))
         return hr;
-    
+
 
     //swap chain 생성, double buffer와 비슷(?)한 것 프레임을 새로 그릴 때 깜빡임 제거
     IDXGIFactory2* dxgiFactory2 = nullptr;
@@ -357,7 +357,7 @@ HRESULT InitDevice()
 
     if (FAILED(hr))
         return hr;
-    
+
     hr = g_pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &g_pRenderTargetView);
     pBackBuffer->Release();
     if (FAILED(hr))
@@ -437,12 +437,12 @@ HRESULT InitDevice()
     //input layout 설정
     g_pImmediateContext->IASetInputLayout(g_pVertexLayout);
 
-    
+
     //model mesh 생성
     m_model = Model::CreateFromCMO(g_pd3dDevice, L"cup.cmo", *m_fxFactory);
     m_world = SimpleMath::Matrix::Identity;
 
-    
+
 
 
     ////pixel shader 컴파일
@@ -580,7 +580,7 @@ HRESULT InitDevice()
 
 HRESULT InitVB()
 {
-    
+
     return E_NOTIMPL;
 }
 
@@ -678,9 +678,9 @@ void CleanupDevice()
     if (g_pd3dDevice) g_pd3dDevice->Release();
 
 
-    if(m_states)m_states.reset();
-    if(m_fxFactory)m_fxFactory.reset();
-    if(m_model)m_model.reset();
+    if (m_states)m_states.reset();
+    if (m_fxFactory)m_fxFactory.reset();
+    if (m_model)m_model.reset();
 
 }
 
