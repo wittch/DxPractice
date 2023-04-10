@@ -7,7 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WindowsProject2", "WindowsP
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTK_Desktop_2019", "D:\DxSample\DirectXTK\DirectXTK_Desktop_2019.vcxproj", "{E0B52AE7-E160-4D32-BF3F-910B785E5A8E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dx12Project4", "..\dx12Project4\dx12Project4.vcxproj", "{5743D9F8-5438-4B77-BA7E-A99E68370532}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DX12Practice", "dx12Project4\dx12Project4.vcxproj", "{5743D9F8-5438-4B77-BA7E-A99E68370532}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
