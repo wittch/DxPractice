@@ -198,8 +198,8 @@ void DX12Practice::LoadAssets()
         UINT compileFlags = 0;
 #endif
 
-        ThrowIfFailed(D3DCompileFromFile(GetAssetFullPath(L"shaders.hlsl").c_str(), nullptr, nullptr, "VSMain", "vs_5_0", compileFlags, 0, &vertexShader, nullptr));
-        ThrowIfFailed(D3DCompileFromFile(GetAssetFullPath(L"shaders.hlsl").c_str(), nullptr, nullptr, "PSMain", "ps_5_0", compileFlags, 0, &pixelShader, nullptr));
+        ThrowIfFailed(D3DCompileFromFile(GetAssetFullPath(L"Shaders.hlsl").c_str(), nullptr, nullptr, "VSMain", "vs_5_0", compileFlags, 0, &vertexShader, nullptr));
+        ThrowIfFailed(D3DCompileFromFile(GetAssetFullPath(L"Shaders.hlsl").c_str(), nullptr, nullptr, "PSMain", "ps_5_0", compileFlags, 0, &pixelShader, nullptr));
 
         // Define the vertex input layout.
         D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
@@ -229,17 +229,22 @@ void DX12Practice::LoadAssets()
     // Create the command list.
     ThrowIfFailed(m_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator.Get(), m_pipelineState.Get(), IID_PPV_ARGS(&m_commandList)));
 
+ 
+
+
     // Create the vertex buffer.
     {
-        // Define the geometry for a triangle.
-        Vertex triangleVertices[] =
-        {
-            { { 0.0f, 0.25f * m_aspectRatio, 0.0f }, { 0.5f, 0.0f } },
-            { { 0.25f, -0.25f * m_aspectRatio, 0.0f }, { 1.0f, 1.0f } },
-            { { -0.25f, -0.25f * m_aspectRatio, 0.0f }, { 0.0f, 1.0f } }
-        };
+        std::vector<Vertex> gridVertices;
 
-        const UINT vertexBufferSize = sizeof(triangleVertices);
+        for (int x = 0; x < 16; x++)
+        {
+            for (int y = 0; y < 16; y++)
+            {
+                gridVertices.push_back({ {x * 0.25f * m_aspectRatio, y * 0.25f * m_aspectRatio,0.0f},{0.0f,0.0f} });
+            }
+        }
+        
+        const UINT vertexBufferSize = sizeof(gridVertices);
 
         // Note: using upload heaps to transfer static data like vert buffers is not 
         // recommended. Every time the GPU needs it, the upload heap will be marshalled 
@@ -257,7 +262,7 @@ void DX12Practice::LoadAssets()
         UINT8* pVertexDataBegin;
         CD3DX12_RANGE readRange(0, 0);        // We do not intend to read from this resource on the CPU.
         ThrowIfFailed(m_vertexBuffer->Map(0, &readRange, reinterpret_cast<void**>(&pVertexDataBegin)));
-        memcpy(pVertexDataBegin, triangleVertices, sizeof(triangleVertices));
+        memcpy(pVertexDataBegin, &gridVertices, sizeof(gridVertices));
         m_vertexBuffer->Unmap(0, nullptr);
 
         // Initialize the vertex buffer view.
@@ -387,6 +392,9 @@ std::vector<UINT8> DX12Practice::GenerateTextureData()
     return data;
 }
 
+
+
+
 // Update frame-based values.
 void DX12Practice::OnUpdate()
 {
@@ -397,6 +405,19 @@ void DX12Practice::OnRender()
 {
     // Record all the commands we need to render the scene into the command list.
     PopulateCommandList();
+
+    //// Draw ground planes
+        static const XMVECTORF32 s_vXAxis = { 20.f, 0.f, 0.f, 0.f };
+        static const XMVECTORF32 s_vYAxis = { 0.f, 0.f, 20.f, 0.f };
+
+        static const XMVECTORF32 s_Offset = { 0.f, 10.f, 0.f, 0.f };
+        XMVECTOR vOrigin = {1.f,1.f,1.f};
+
+        const int iXDivisions = 20;
+        const int iYDivisions = 20;
+        
+
+
 
     // Execute the command list.
     ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
