@@ -205,7 +205,7 @@ void DX12Practice::LoadAssets()
         D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
         {
             { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-            { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+            { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
         };
 
         // Describe and create the graphics pipeline state object (PSO).
@@ -221,7 +221,7 @@ void DX12Practice::LoadAssets()
         psoDesc.SampleMask = UINT_MAX;
         psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
         psoDesc.NumRenderTargets = 1;
-        psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+        psoDesc.RTVFormats[0] = DXGI_FORMAT_R32G32B32_FLOAT;
         psoDesc.SampleDesc.Count = 1;
         ThrowIfFailed(m_device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_pipelineState)));
     }
@@ -240,7 +240,7 @@ void DX12Practice::LoadAssets()
         {
             for (int y = 0; y < 16; y++)
             {
-                gridVertices.push_back({ {x * 0.25f * m_aspectRatio, y * 0.25f * m_aspectRatio,0.0f},{0.0f,0.0f} });
+                gridVertices.push_back({ {x * 0.25f * m_aspectRatio, y * 0.25f * m_aspectRatio,0.0f},{ 1.0f, 0.0f, 0.0f, 1.0f } });
             }
         }
         
@@ -275,67 +275,69 @@ void DX12Practice::LoadAssets()
     // the command list that references it has finished executing on the GPU.
     // We will flush the GPU at the end of this method to ensure the resource is not
     // prematurely destroyed.
-    ComPtr<ID3D12Resource> textureUploadHeap;
+    //ComPtr<ID3D12Resource> textureUploadHeap;
 
-    // Create the texture.
-    {
-        // Describe and create a Texture2D.
-        D3D12_RESOURCE_DESC textureDesc = {};
-        textureDesc.MipLevels = 1;
-        textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        textureDesc.Width = TextureWidth;
-        textureDesc.Height = TextureHeight;
-        textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-        textureDesc.DepthOrArraySize = 1;
-        textureDesc.SampleDesc.Count = 1;
-        textureDesc.SampleDesc.Quality = 0;
-        textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    //// Create the texture.
+    //{
+    //    // Describe and create a Texture2D.
+    //    D3D12_RESOURCE_DESC textureDesc = {};
+    //    textureDesc.MipLevels = 1;
+    //    textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    //    textureDesc.Width = TextureWidth;
+    //    textureDesc.Height = TextureHeight;
+    //    textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+    //    textureDesc.DepthOrArraySize = 1;
+    //    textureDesc.SampleDesc.Count = 1;
+    //    textureDesc.SampleDesc.Quality = 0;
+    //    textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 
-        ThrowIfFailed(m_device->CreateCommittedResource(
-            &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-            D3D12_HEAP_FLAG_NONE,
-            &textureDesc,
-            D3D12_RESOURCE_STATE_COPY_DEST,
-            nullptr,
-            IID_PPV_ARGS(&m_texture)));
+    //    ThrowIfFailed(m_device->CreateCommittedResource(
+    //        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+    //        D3D12_HEAP_FLAG_NONE,
+    //        &textureDesc,
+    //        D3D12_RESOURCE_STATE_COPY_DEST,
+    //        nullptr,
+    //        IID_PPV_ARGS(&m_texture)));
 
-        const UINT64 uploadBufferSize = GetRequiredIntermediateSize(m_texture.Get(), 0, 1);
+    //    const UINT64 uploadBufferSize = GetRequiredIntermediateSize(m_texture.Get(), 0, 1);
 
-        // Create the GPU upload buffer.
-        ThrowIfFailed(m_device->CreateCommittedResource(
-            &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-            D3D12_HEAP_FLAG_NONE,
-            &CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize),
-            D3D12_RESOURCE_STATE_GENERIC_READ,
-            nullptr,
-            IID_PPV_ARGS(&textureUploadHeap)));
+    //    // Create the GPU upload buffer.
+    //    ThrowIfFailed(m_device->CreateCommittedResource(
+    //        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+    //        D3D12_HEAP_FLAG_NONE,
+    //        &CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize),
+    //        D3D12_RESOURCE_STATE_GENERIC_READ,
+    //        nullptr,
+    //        IID_PPV_ARGS(&textureUploadHeap)));
 
-        // Copy data to the intermediate upload heap and then schedule a copy 
-        // from the upload heap to the Texture2D.
-        std::vector<UINT8> texture = GenerateTextureData();
+    //    // Copy data to the intermediate upload heap and then schedule a copy 
+    //    // from the upload heap to the Texture2D.
+    //    std::vector<UINT8> texture = GenerateTextureData();
 
-        D3D12_SUBRESOURCE_DATA textureData = {};
-        textureData.pData = &texture[0];
-        textureData.RowPitch = TextureWidth * TexturePixelSize;
-        textureData.SlicePitch = textureData.RowPitch * TextureHeight;
+    //    D3D12_SUBRESOURCE_DATA textureData = {};
+    //    textureData.pData = &texture[0];
+    //    textureData.RowPitch = TextureWidth * TexturePixelSize;
+    //    textureData.SlicePitch = textureData.RowPitch * TextureHeight;
 
-        UpdateSubresources(m_commandList.Get(), m_texture.Get(), textureUploadHeap.Get(), 0, 0, 1, &textureData);
-        m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_texture.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
+    //    UpdateSubresources(m_commandList.Get(), m_texture.Get(), textureUploadHeap.Get(), 0, 0, 1, &textureData);
+    //    m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_texture.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
 
-        // Describe and create a SRV for the texture.
-        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        srvDesc.Format = textureDesc.Format;
-        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-        srvDesc.Texture2D.MipLevels = 1;
-        m_device->CreateShaderResourceView(m_texture.Get(), &srvDesc, m_srvHeap->GetCPUDescriptorHandleForHeapStart());
-    }
+    //    // Describe and create a SRV for the texture.
+    //    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    //    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    //    srvDesc.Format = textureDesc.Format;
+    //    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    //    srvDesc.Texture2D.MipLevels = 1;
+    //    m_device->CreateShaderResourceView(m_texture.Get(), &srvDesc, m_srvHeap->GetCPUDescriptorHandleForHeapStart());
+    //}
 
     // Close the command list and execute it to begin the initial GPU setup.
     ThrowIfFailed(m_commandList->Close());
     ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
     m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 
+
+   
     // Create synchronization objects and wait until assets have been uploaded to the GPU.
     {
         ThrowIfFailed(m_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
@@ -406,19 +408,6 @@ void DX12Practice::OnRender()
     // Record all the commands we need to render the scene into the command list.
     PopulateCommandList();
 
-    //// Draw ground planes
-        static const XMVECTORF32 s_vXAxis = { 20.f, 0.f, 0.f, 0.f };
-        static const XMVECTORF32 s_vYAxis = { 0.f, 0.f, 20.f, 0.f };
-
-        static const XMVECTORF32 s_Offset = { 0.f, 10.f, 0.f, 0.f };
-        XMVECTOR vOrigin = {1.f,1.f,1.f};
-
-        const int iXDivisions = 20;
-        const int iYDivisions = 20;
-        
-
-
-
     // Execute the command list.
     ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
     m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
@@ -469,7 +458,7 @@ void DX12Practice::PopulateCommandList()
     // Record commands.
     const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
     m_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-    m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    m_commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
     m_commandList->IASetVertexBuffers(0, 1, &m_vertexBufferView);
     m_commandList->DrawInstanced(3, 1, 0, 0);
 

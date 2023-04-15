@@ -23,7 +23,7 @@ private:
     struct Vertex
     {
         XMFLOAT3 position;
-        XMFLOAT2 uv;
+        XMFLOAT4 color;
     };
 
     // Pipeline objects.
