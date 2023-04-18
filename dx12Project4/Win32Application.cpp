@@ -29,7 +29,7 @@ int Win32Application::Run(DXBaise* pBaise, HINSTANCE hInstance, int nCmdShow)
     windowClass.lpfnWndProc = WindowProc;
     windowClass.hInstance = hInstance;
     windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-    windowClass.lpszClassName = L"DXSampleClass";
+    windowClass.lpszClassName = L"DXBaiseClass";
     RegisterClassEx(&windowClass);
 
     RECT windowRect = { 0, 0, static_cast<LONG>(pBaise->GetWidth()), static_cast<LONG>(pBaise->GetHeight()) };

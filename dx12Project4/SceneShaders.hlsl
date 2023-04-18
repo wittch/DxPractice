@@ -8,6 +8,12 @@
 // PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 //
 //*********************************************************
+//
+//cbuffer SceneConstantBuffer : register(b0)
+//{
+//    float4x4 transform;
+//    float4 offset;
+//};
 
 struct PSInput
 {
@@ -19,7 +25,7 @@ PSInput VSMain(float4 position : POSITION, float4 color : COLOR)
 {
     PSInput result;
 
-    result.position = position;
+    result.position = position;// mul(position, transform);
     result.color = color;
 
     return result;
