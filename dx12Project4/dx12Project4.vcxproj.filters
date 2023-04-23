@@ -39,6 +39,9 @@
     <ClCompile Include="GridVisualizer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="FrustumVisualizer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DXBaise.h">
@@ -62,6 +65,9 @@
     <ClInclude Include="GridVisualizer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="FrustumVisualizer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="SceneShaders.hlsl">
@@ -70,5 +76,15 @@
     <CustomBuild Include="PostShaders.hlsl">
       <Filter>Assets\Shaders</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FrustumMS.hlsl">
+      <Filter>Assets\Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="DebugDrawPS.hlsl">
+      <Filter>Assets\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

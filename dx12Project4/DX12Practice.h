@@ -14,6 +14,33 @@ public:
     virtual void OnRender();
     virtual void OnDestroy();
 
+protected:
+
+    void GetHardwareAdapter(
+        _In_ IDXGIFactory1* pFactory,
+        _Outptr_result_maybenull_ IDXGIAdapter1** ppAdapter,
+        bool requestHighPerformanceAdapter = false);
+
+    void SetCustomWindowText(LPCWSTR text);
+    void CheckTearingSupport();
+
+    // Viewport dimensions.
+    UINT m_width;
+    UINT m_height;
+    float m_aspectRatio;
+
+    // Window bounds
+    RECT m_windowBounds;
+
+    // Whether or not tearing is available for fullscreen borderless windowed mode.
+    bool m_tearingSupport;
+
+    // Adapter info.
+    bool m_useWarpDevice;
+
+    // Override to be able to start without Dx11on12 UI for PIX. PIX doesn't support 11 on 12. 
+    bool m_enableUI;
+
 private:
     static const UINT FrameCount = 2;
     static const UINT TextureWidth = 256;
@@ -60,6 +87,8 @@ private:
     HANDLE m_fenceEvent;
     ComPtr<ID3D12Fence> m_fence;
     UINT64 m_fenceValue;
+
+    
 
     void LoadPipeline();
     void LoadAssets();

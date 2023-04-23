@@ -12,6 +12,7 @@
 #include "stdafx.h"
 #include "DX12Practice.h"
 
+std::unique_ptr<PrimitiveBatch<VertexPositionColor>>    g_Batch;
 
 DX12Practice::DX12Practice(UINT width, UINT height, std::wstring name) :
     DXBaise(width, height, name),
@@ -92,6 +93,9 @@ void DX12Practice::LoadPipeline()
     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     swapChainDesc.SampleDesc.Count = 1;
 
+    // It is recommended to always use the tearing flag when it is available.
+    swapChainDesc.Flags = m_tearingSupport ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
+
     ComPtr<IDXGISwapChain1> swapChain;
     ThrowIfFailed(factory->CreateSwapChainForHwnd(
         m_commandQueue.Get(),        // Swap chain needs the queue so that it can force a flush on it.
@@ -102,8 +106,13 @@ void DX12Practice::LoadPipeline()
         &swapChain
     ));
 
-    // This sample does not support fullscreen transitions.
-    ThrowIfFailed(factory->MakeWindowAssociation(Win32Application::GetHwnd(), DXGI_MWA_NO_ALT_ENTER));
+    if (m_tearingSupport)
+    {
+        
+        ThrowIfFailed(factory->MakeWindowAssociation(Win32Application::GetHwnd(), DXGI_MWA_NO_ALT_ENTER));
+    }
+
+    
 
     ThrowIfFailed(swapChain.As(&m_swapChain));
     m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
@@ -117,12 +126,12 @@ void DX12Practice::LoadPipeline()
         rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
         ThrowIfFailed(m_device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&m_rtvHeap)));
 
-        //// Describe and create a shader resource view (SRV) heap for the texture.
-        //D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-        //srvHeapDesc.NumDescriptors = 1;
-        //srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-        //srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-        //ThrowIfFailed(m_device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_srvHeap)));
+        // Describe and create a shader resource view (SRV) heap for the texture.
+        D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+        srvHeapDesc.NumDescriptors = 1;
+        srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+        srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+        ThrowIfFailed(m_device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_srvHeap)));
 
         // Describe and create a depth stencil view (DSV) descriptor heap.
         D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
@@ -618,7 +627,55 @@ std::vector<UINT8> DX12Practice::GenerateTextureData()
     return data;
 }
 
+void DrawFrustum(const BoundingFrustum& frustum, FXMVECTOR color)
+{
+    XMFLOAT3 corners[BoundingFrustum::CORNER_COUNT];
+    frustum.GetCorners(corners);
 
+    VertexPositionColor verts[24];
+    verts[0].position = corners[0];
+    verts[1].position = corners[1];
+    verts[2].position = corners[1];
+    verts[3].position = corners[2];
+    verts[4].position = corners[2];
+    verts[5].position = corners[3];
+    verts[6].position = corners[3];
+    verts[7].position = corners[0];
+
+    verts[8].position = corners[0];
+    verts[9].position = corners[4];
+    verts[10].position = corners[1];
+    verts[11].position = corners[5];
+    verts[12].position = corners[2];
+    verts[13].position = corners[6];
+    verts[14].position = corners[3];
+    verts[15].position = corners[7];
+
+    verts[16].position = corners[4];
+    verts[17].position = corners[5];
+    verts[18].position = corners[5];
+    verts[19].position = corners[6];
+    verts[20].position = corners[6];
+    verts[21].position = corners[7];
+    verts[22].position = corners[7];
+    verts[23].position = corners[4];
+
+    for (size_t j = 0; j < _countof(verts); ++j)
+    {
+        XMStoreFloat4(&verts[j].color, color);
+    }
+
+    auto context = DXUTGetD3D11DeviceContext();
+    g_BatchEffect->Apply(context);
+
+    context->IASetInputLayout(g_pBatchInputLayout);
+
+    g_Batch->Begin();
+
+    g_Batch->Draw(D3D11_PRIMITIVE_TOPOLOGY_LINELIST, verts, _countof(verts));
+
+    g_Batch->End();
+}
 
 
 // Update frame-based values.
@@ -664,6 +721,8 @@ void DX12Practice::PopulateCommandList()
     // re-recording.
     ThrowIfFailed(m_commandList->Reset(m_commandAllocator.Get(), m_depthOnlyPipelineState.Get()));
     //ThrowIfFailed(m_commandList->Reset(m_commandAllocator.Get(), m_pipelineState.Get()));
+
+    
 
     // Set necessary state.
     m_commandList->SetGraphicsRootSignature(m_rootSignature.Get());
