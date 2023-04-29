@@ -76,18 +76,5 @@
     <CustomBuild Include="PostShaders.hlsl">
       <Filter>Assets\Shaders</Filter>
     </CustomBuild>
-    <CustomBuild Include="VertexShader.hlsl">
-      <Filter>Assets\Shaders</Filter>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="FrustumMS.hlsl">
-      <Filter>Assets\Shaders</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="DebugDrawPS.hlsl">
-      <Filter>Assets\Shaders</Filter>
-    </FxCompile>
   </ItemGroup>
 </Project>
