@@ -450,211 +450,30 @@ void DX12Practice::LoadAssets()
     }
 
 
-    // Create the depth stencil view.
-    {
-    D3D12_DEPTH_STENCIL_VIEW_DESC depthStencilDesc = {};
-    depthStencilDesc.Format = DXGI_FORMAT_D32_FLOAT;
-    depthStencilDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-    depthStencilDesc.Flags = D3D12_DSV_FLAG_NONE;
-
-    D3D12_CLEAR_VALUE depthOptimizedClearValue = {};
-    depthOptimizedClearValue.Format = DXGI_FORMAT_D32_FLOAT;
-    depthOptimizedClearValue.DepthStencil.Depth = 1.0f;
-    depthOptimizedClearValue.DepthStencil.Stencil = 0;
-
-    ThrowIfFailed(m_device->CreateCommittedResource(
-        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-        D3D12_HEAP_FLAG_NONE,
-        &CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, m_width, m_height, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
-        D3D12_RESOURCE_STATE_DEPTH_WRITE,
-        &depthOptimizedClearValue,
-        IID_PPV_ARGS(&m_depthStencil)
-    ));
-
-    NAME_D3D12_OBJECT(m_depthStencil);
-
-    m_device->CreateDepthStencilView(m_depthStencil.Get(), &depthStencilDesc, m_dsvHeap->GetCPUDescriptorHandleForHeapStart());
-    }
-
-
-    // Note: ComPtr's are CPU objects but this resource needs to stay in scope until
-    // the command list that references it has finished executing on the GPU.
-    // We will flush the GPU at the end of this method to ensure the resource is not
-    // prematurely destroyed.
-    //ComPtr<ID3D12Resource> textureUploadHeap;
-
-    //// Create the texture.
-    //{
-    //    // Describe and create a Texture2D.
-    //    D3D12_RESOURCE_DESC textureDesc = {};
-    //    textureDesc.MipLevels = 1;
-    //    textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    //    textureDesc.Width = TextureWidth;
-    //    textureDesc.Height = TextureHeight;
-    //    textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-    //    textureDesc.DepthOrArraySize = 1;
-    //    textureDesc.SampleDesc.Count = 1;
-    //    textureDesc.SampleDesc.Quality = 0;
-    //    textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-
-    //    ThrowIfFailed(m_device->CreateCommittedResource(
-    //        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-    //        D3D12_HEAP_FLAG_NONE,
-    //        &textureDesc,
-    //        D3D12_RESOURCE_STATE_COPY_DEST,
-    //        nullptr,
-    //        IID_PPV_ARGS(&m_texture)));
-
-    //    const UINT64 uploadBufferSize = GetRequiredIntermediateSize(m_texture.Get(), 0, 1);
-
-    //    // Create the GPU upload buffer.
-    //    ThrowIfFailed(m_device->CreateCommittedResource(
-    //        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-    //        D3D12_HEAP_FLAG_NONE,
-    //        &CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize),
-    //        D3D12_RESOURCE_STATE_GENERIC_READ,
-    //        nullptr,
-    //        IID_PPV_ARGS(&textureUploadHeap)));
-
-    //    // Copy data to the intermediate upload heap and then schedule a copy 
-    //    // from the upload heap to the Texture2D.
-    //    std::vector<UINT8> texture = GenerateTextureData();
-
-    //    D3D12_SUBRESOURCE_DATA textureData = {};
-    //    textureData.pData = &texture[0];
-    //    textureData.RowPitch = TextureWidth * TexturePixelSize;
-    //    textureData.SlicePitch = textureData.RowPitch * TextureHeight;
-
-    //    UpdateSubresources(m_commandList.Get(), m_texture.Get(), textureUploadHeap.Get(), 0, 0, 1, &textureData);
-    //    m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_texture.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
-
-    //    // Describe and create a SRV for the texture.
-    //    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-    //    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    //    srvDesc.Format = textureDesc.Format;
-    //    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    //    srvDesc.Texture2D.MipLevels = 1;
-    //    m_device->CreateShaderResourceView(m_texture.Get(), &srvDesc, m_srvHeap->GetCPUDescriptorHandleForHeapStart());
-    //}
-
-    //// Close the command list and execute it to begin the initial GPU setup.
-    //ThrowIfFailed(m_commandList->Close());
-    //ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
-    //m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
-
-
-   
     // Create synchronization objects and wait until assets have been uploaded to the GPU.
     {
-        ThrowIfFailed(m_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
-        m_fenceValue = 1;
+    ThrowIfFailed(m_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
+    m_fenceValue = 1;
 
-        // Create an event handle to use for frame synchronization.
-        m_fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-        if (m_fenceEvent == nullptr)
-        {
-            ThrowIfFailed(HRESULT_FROM_WIN32(GetLastError()));
-        }
-
-        // Wait for the command list to execute; we are reusing the same command 
-        // list in our main loop but for now, we just want to wait for setup to 
-        // complete before continuing.
-        WaitForPreviousFrame();
-    }
-}
-
-// Generate a simple black and white checkerboard texture.
-std::vector<UINT8> DX12Practice::GenerateTextureData()
-{
-    const UINT rowPitch = TextureWidth * TexturePixelSize;
-    const UINT cellPitch = rowPitch >> 3;        // The width of a cell in the checkboard texture.
-    const UINT cellHeight = TextureWidth >> 3;    // The height of a cell in the checkerboard texture.
-    const UINT textureSize = rowPitch * TextureHeight;
-
-    std::vector<UINT8> data(textureSize);
-    UINT8* pData = &data[0];
-
-    for (UINT n = 0; n < textureSize; n += TexturePixelSize)
+    // Create an event handle to use for frame synchronization.
+    m_fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+    if (m_fenceEvent == nullptr)
     {
-        UINT x = n % rowPitch;
-        UINT y = n / rowPitch;
-        UINT i = x / cellPitch;
-        UINT j = y / cellHeight;
-
-        if (i % 2 == j % 2)
-        {
-            pData[n] = 0x00;        // R
-            pData[n + 1] = 0x00;    // G
-            pData[n + 2] = 0x00;    // B
-            pData[n + 3] = 0xff;    // A
-        }
-        else
-        {
-            pData[n] = 0xff;        // R
-            pData[n + 1] = 0xff;    // G
-            pData[n + 2] = 0xff;    // B
-            pData[n + 3] = 0xff;    // A
-        }
+        ThrowIfFailed(HRESULT_FROM_WIN32(GetLastError()));
     }
 
-    return data;
-}
-
-void DrawFrustum(const BoundingFrustum& frustum, FXMVECTOR color)
-{
-    XMFLOAT3 corners[BoundingFrustum::CORNER_COUNT];
-    frustum.GetCorners(corners);
-
-    VertexPositionColor verts[24];
-    verts[0].position = corners[0];
-    verts[1].position = corners[1];
-    verts[2].position = corners[1];
-    verts[3].position = corners[2];
-    verts[4].position = corners[2];
-    verts[5].position = corners[3];
-    verts[6].position = corners[3];
-    verts[7].position = corners[0];
-
-    verts[8].position = corners[0];
-    verts[9].position = corners[4];
-    verts[10].position = corners[1];
-    verts[11].position = corners[5];
-    verts[12].position = corners[2];
-    verts[13].position = corners[6];
-    verts[14].position = corners[3];
-    verts[15].position = corners[7];
-
-    verts[16].position = corners[4];
-    verts[17].position = corners[5];
-    verts[18].position = corners[5];
-    verts[19].position = corners[6];
-    verts[20].position = corners[6];
-    verts[21].position = corners[7];
-    verts[22].position = corners[7];
-    verts[23].position = corners[4];
-
-    for (size_t j = 0; j < _countof(verts); ++j)
-    {
-        XMStoreFloat4(&verts[j].color, color);
+    // Wait for the command list to execute; we are reusing the same command 
+    // list in our main loop but for now, we just want to wait for setup to 
+    // complete before continuing.
+    WaitForPreviousFrame();
     }
-
-    auto context = DXUTGetD3D11DeviceContext();
-    g_BatchEffect->Apply(context);
-
-    context->IASetInputLayout(g_pBatchInputLayout);
-
-    g_Batch->Begin();
-
-    g_Batch->Draw(D3D11_PRIMITIVE_TOPOLOGY_LINELIST, verts, _countof(verts));
-
-    g_Batch->End();
 }
 
 
 // Update frame-based values.
 void DX12Practice::OnUpdate()
 {
-    m_frameNumber++;
+   
 }
 
 // Render the scene.
@@ -706,13 +525,13 @@ void DX12Practice::PopulateCommandList()
     m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_renderTargets[m_frameIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
     CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_rtvHeap->GetCPUDescriptorHandleForHeapStart(), m_frameIndex, m_rtvDescriptorSize);
-    CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_dsvHeap->GetCPUDescriptorHandleForHeapStart());
-    m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
+    
+    m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
     // Record commands.
     const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
     m_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-    m_commandList->ClearDepthStencilView(m_dsvHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+   
 
     m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
     m_commandList->IASetVertexBuffers(0, 1, &m_vertexBufferView);

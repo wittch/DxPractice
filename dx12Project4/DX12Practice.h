@@ -16,13 +16,7 @@ public:
 
 protected:
 
-    void GetHardwareAdapter(
-        _In_ IDXGIFactory1* pFactory,
-        _Outptr_result_maybenull_ IDXGIAdapter1** ppAdapter,
-        bool requestHighPerformanceAdapter = false);
 
-    void SetCustomWindowText(LPCWSTR text);
-    void CheckTearingSupport();
 
     // Viewport dimensions.
     UINT m_width;
@@ -94,7 +88,6 @@ private:
     void LoadAssets();
     void PopulateCommandList();
     void WaitForPreviousFrame();
-    std::vector<UINT8> GenerateTextureData();
     
 };
 
