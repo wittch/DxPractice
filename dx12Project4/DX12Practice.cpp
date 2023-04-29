@@ -262,7 +262,7 @@ void DX12Practice::LoadAssets()
 
         renderWithDBTPSOStream.RootSignature = m_rootSignature.Get();
         renderWithDBTPSOStream.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
-        renderWithDBTPSOStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+        renderWithDBTPSOStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
         renderWithDBTPSOStream.VS = CD3DX12_SHADER_BYTECODE(vertexShader.Get());
         renderWithDBTPSOStream.PS = CD3DX12_SHADER_BYTECODE(pixelShader.Get());
         renderWithDBTPSOStream.DSVFormat = DXGI_FORMAT_D32_FLOAT;
@@ -296,7 +296,7 @@ void DX12Practice::LoadAssets()
 
         depthOnlyPSOStream.RootSignature = m_rootSignature.Get();
         depthOnlyPSOStream.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
-        depthOnlyPSOStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+        depthOnlyPSOStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
         depthOnlyPSOStream.VS = CD3DX12_SHADER_BYTECODE(vertexShader.Get());
         depthOnlyPSOStream.DSVFormat = DXGI_FORMAT_D32_FLOAT;
         depthOnlyPSOStream.RTVFormats = RTFormatArray;
@@ -332,124 +332,97 @@ void DX12Practice::LoadAssets()
 
     // Create the vertex buffer.
     {
-        Vertex gridVertices[] = {
-            {{-1.0f, -1.0f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.75f, -1.0f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.50f, -1.0f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.25f, -1.0f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.0f, -1.0f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.25f, -1.0f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.75f, -1.0f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{1.0f, -1.0f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-
-            {{-1.0f, -0.75f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.75f, -0.75f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.50f, -0.75f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.25f, -0.75f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.0f, -0.75f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.25f, -0.75f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.75f, -0.75f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{1.0f, -0.75f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-
-            {{-1.0f, -0.25f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.75f, -0.25f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.50f, -0.25f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.25f, -0.25f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.0f, -0.25f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.25f, -0.25f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.75f, -0.25f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{1.0f, -0.25f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-
-
-            {{-1.0f, 0.f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.75f, 0.f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.50f, 0.f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.25f, 0.f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.0f, 0.f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.25f, 0.f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.75f, 0.f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{1.0f, 0.f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-
-
-            {{-1.0f, 0.25f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.75f, 0.25f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.50f, 0.25f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.25f, 0.25f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.0f, 0.25f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.25f, 0.25f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.75f, 0.25f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{1.0f, 0.25f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-
-            {{-1.0f, 0.75f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.75f, 0.75f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.50f, 0.75f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.25f, 0.75f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.0f, 0.75f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.25f, 0.75f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.75f, 0.75f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{1.0f, 0.75f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-
-
-            {{-1.0f, 1.0f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.75f, 1.0f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.50f, 1.0f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-0.25f, 1.0f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.0f, 1.0f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.25f, 1.0f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{0.75f, 1.0f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{1.0f, 1.0f * m_aspectRatio, 0.0f},{1.0f,0.0f,0.0f,1.0f}},
-
-
-        };
-
-        Vertex cubeVertices[] =
-        {
-            {{-1.0f, 1.0f, -1.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{ 1.0f, 1.0f, -1.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{1.0f, 1.0f, 1.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-1.0f, 1.0f, 1.0f},{1.0f,0.0f,0.0f,1.0f}},
-
-            {{ -1.0f, -1.0f, -1.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{1.0f, -1.0f, -1.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{1.0f, -1.0f, 1.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-1.0f, -1.0f, 1.0f},{1.0f,0.0f,0.0f,1.0f}},
-
-            {{-1.0f, -1.0f, 1.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-1.0f, -1.0f, -1.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-1.0f, 1.0f, -1.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-1.0f, 1.0f, 1.0f},{1.0f,0.0f,0.0f,1.0f}},
-
-            {{1.0f, -1.0f, 1.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{1.0f, -1.0f, -1.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{1.0f, 1.0f, -1.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{1.0f, 1.0f, 1.0f},{1.0f,0.0f,0.0f,1.0f}},
-
-            {{-1.0f, -1.0f, 1.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{1.0f, -1.0f, -1.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{1.0f, 1.0f, -1.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-1.0f, 1.0f, -1.0f},{1.0f,0.0f,0.0f,1.0f}},
-
-            {{-1.0f, -1.0f, 1.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{1.0f, -1.0f, 1.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{1.0f, 1.0f, 1.0f},{1.0f,0.0f,0.0f,1.0f}},
-            {{-1.0f, 1.0f, 1.0f},{1.0f,0.0f,0.0f,1.0f}},
-        };
 
         Vertex tmpVertices[] = 
         {
-             /*{ { 0.0f, 0.25f * m_aspectRatio, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
-            { { 0.25f, -0.25f * m_aspectRatio, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
-            { { -0.25f, -0.25f * m_aspectRatio, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } }*/
             { { 0.00f,  0.25f * m_aspectRatio, 0.1f },    // Top
             { 1.0f,   0.0f,  0.0f,  1.0f } },        // Red
             { { 0.25f, -0.25f * m_aspectRatio, 0.9f },    // Right
             { 0.0f,   1.0f,  0.0f,  1.0f } },        // Green
+
+            //{ { 0.25f, -0.25f * m_aspectRatio, 0.9f },    // Right
+            //{ 0.0f,   1.0f,  0.0f,  1.0f } },        // Green
             { { -0.25f, -0.25f * m_aspectRatio, 0.5f },    // Left
-            { 0.0f,   0.0f,  1.0f,  1.0f } }         // Blue
+            { 0.0f,   0.0f,  1.0f,  1.0f } },         // Blue
+
+            //{ { -0.25f, -0.25f * m_aspectRatio, 0.5f },    // Left
+            //{ 0.0f,   0.0f,  1.0f,  1.0f } },         // Blue
+            { { 0.00f,  0.25f * m_aspectRatio, 0.1f },    // Top
+            { 1.0f,   0.0f,  0.0f,  1.0f } },        // Red
+
         };
         
+        float fovy = 2.0f;
         
-        const UINT vertexBufferSize = sizeof(tmpVertices);
+        std::vector<XMFLOAT3> vertices =
+        {
+            //*** near place
+            {-0.25f, 0.25f, 0.25f },//left top
+            {-0.25f, -0.25f, 0.25f}, // left bottom
+            {0.25f, -0.25f, 0.0f},// right bottom
+            {0.25f, 0.25f,0.0f},// right top
+
+
+            //***far place
+            {-0.25f * fovy, 0.25f * fovy, 0.25f },//left top
+            {-0.25f * fovy, -0.25f * fovy, 0.25f}, // left bottom
+            {0.25f * fovy, -0.25f * fovy, 0.0f},// right bottom
+            {0.25f * fovy, 0.25f * fovy,0.0f},// right top
+
+        };
+
+
+
+        Vertex FrustumVertices[] =
+        {
+            //*** near place draw ccw
+            {vertices[0],{1.0f,0.0f,0.0f,1.0f}},
+            {vertices[1],{1.0f,0.0f,0.0f,1.0f}},
+            
+            {vertices[1],{1.0f,0.0f,0.0f,1.0f}},
+            {vertices[2], {1.0f,0.0f,0.0f,1.0f}},
+            
+            {vertices[2],{1.0f,0.0f,0.0f,1.0f}},
+            {vertices[3],{1.0f,0.0f,0.0f,1.0f}},
+            
+            {vertices[3], {1.0f,0.0f,0.0f,1.0f}},
+            {vertices[0],{1.0f,0.0f,0.0f,1.0f}},
+
+            
+            //***far place draw ccw
+            {vertices[4],{1.0f,0.0f,0.0f,1.0f}},
+            {vertices[5],{1.0f,0.0f,0.0f,1.0f}},
+
+            {vertices[5],{1.0f,0.0f,0.0f,1.0f}},
+            {vertices[6], {1.0f,0.0f,0.0f,1.0f}},
+
+            {vertices[6],{1.0f,0.0f,0.0f,1.0f}},
+            {vertices[7],{1.0f,0.0f,0.0f,1.0f}},
+
+            {vertices[7], {1.0f,0.0f,0.0f,1.0f}},
+            {vertices[4],{1.0f,0.0f,0.0f,1.0f}},
+
+            //***near to far
+            {vertices[0],{1.0f,0.0f,0.0f,1.0f}},
+            {vertices[4],{1.0f,0.0f,0.0f,1.0f}},
+
+            {vertices[1],{1.0f,0.0f,0.0f,1.0f}},
+            {vertices[5], {1.0f,0.0f,0.0f,1.0f}},
+
+            {vertices[2],{1.0f,0.0f,0.0f,1.0f}},
+            {vertices[6],{1.0f,0.0f,0.0f,1.0f}},
+
+            {vertices[3], {1.0f,0.0f,0.0f,1.0f}},
+            {vertices[7],{1.0f,0.0f,0.0f,1.0f}},
+        };
+        
+
+
+
+
+
+
+        const UINT vertexBufferSize = sizeof(FrustumVertices);
 
         // Note: using upload heaps to transfer static data like vert buffers is not 
         // recommended. Every time the GPU needs it, the upload heap will be marshalled 
@@ -467,7 +440,7 @@ void DX12Practice::LoadAssets()
         UINT8* pVertexDataBegin;
         CD3DX12_RANGE readRange(0, 0);        // We do not intend to read from this resource on the CPU.
         ThrowIfFailed(m_vertexBuffer->Map(0, &readRange, reinterpret_cast<void**>(&pVertexDataBegin)));
-        memcpy(pVertexDataBegin, tmpVertices, sizeof(tmpVertices));
+        memcpy(pVertexDataBegin, FrustumVertices, sizeof(FrustumVertices));
         m_vertexBuffer->Unmap(0, nullptr);
 
         // Initialize the vertex buffer view.
@@ -741,15 +714,17 @@ void DX12Practice::PopulateCommandList()
     m_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
     m_commandList->ClearDepthStencilView(m_dsvHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-    m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
     m_commandList->IASetVertexBuffers(0, 1, &m_vertexBufferView);
 
-    // Render only the depth stencil view of the triangle to prime the depth value of the triangle
-    m_commandList->DrawInstanced(3, 1, 0, 0);
+    UINT VertexBufferSize = m_vertexBufferView.SizeInBytes;
 
+    // Render only the depth stencil view of the triangle to prime the depth value of the triangle
+    m_commandList->DrawInstanced(VertexBufferSize, 1, 0, 0);
+    
     // Move depth bounds so we can see they move. Depth bound test will test against DEST depth
     // that we primed previously
-    const FLOAT f = 0.125f + sinf((m_frameNumber & 0x7F) / 127.f) * 0.125f;      // [0.. 0.25]
+    const FLOAT f = 0;// 0.125f + sinf((m_frameNumber & 0x7F) / 127.f) * 0.125f;      // [0.. 0.25]
     if (DepthBoundsTestSupported)
     {
         m_commandList->OMSetDepthBounds(0.0f + f, 1.0f - f);
@@ -757,7 +732,7 @@ void DX12Practice::PopulateCommandList()
 
     // Render the triangle with depth bounds
     m_commandList->SetPipelineState(m_pipelineState.Get());
-    m_commandList->DrawInstanced(3, 1, 0, 0);
+    m_commandList->DrawInstanced(VertexBufferSize, 1, 0, 0);
 
     // Disable depth bounds on Direct3D 12 by resetting back to the default range
     if (DepthBoundsTestSupported)
