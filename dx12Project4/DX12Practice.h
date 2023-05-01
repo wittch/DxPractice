@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DXBaise.h"
+#include "Frustum.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -82,7 +83,7 @@ private:
     ComPtr<ID3D12Fence> m_fence;
     UINT64 m_fenceValue;
 
-    
+    Frustum                  m_frustumDraw;
 
     void LoadPipeline();
     void LoadAssets();

@@ -467,6 +467,7 @@ void DX12Practice::LoadAssets()
     // complete before continuing.
     WaitForPreviousFrame();
     }
+    m_frustumDraw.CreateDeviceResources(m_device.Get(), m_renderTargets[0]->GetDesc().Format, m_depthStencil->GetDesc().Format);
 }
 
 
@@ -539,7 +540,7 @@ void DX12Practice::PopulateCommandList()
     UINT VertexBufferSize = m_vertexBufferView.SizeInBytes;
 
     // Render only the depth stencil view of the triangle to prime the depth value of the triangle
-    m_commandList->DrawInstanced(VertexBufferSize, 1, 0, 0);
+    //m_commandList->DrawInstanced(VertexBufferSize, 1, 0, 0);
     
     // Move depth bounds so we can see they move. Depth bound test will test against DEST depth
     // that we primed previously
@@ -551,8 +552,9 @@ void DX12Practice::PopulateCommandList()
 
     // Render the triangle with depth bounds
     m_commandList->SetPipelineState(m_pipelineState.Get());
-    m_commandList->DrawInstanced(VertexBufferSize, 1, 0, 0);
+    //m_commandList->DrawInstanced(VertexBufferSize, 1, 0, 0);
 
+    m_frustumDraw.Draw(m_commandList.Get());
     // Disable depth bounds on Direct3D 12 by resetting back to the default range
     if (DepthBoundsTestSupported)
     {
