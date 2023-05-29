@@ -160,6 +160,8 @@
     <ClCompile Include="FrustumVisualizer.cpp" />
     <ClCompile Include="GridVisualizer.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="SimpleCamera.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Win32Application.cpp" />
   </ItemGroup>
@@ -171,6 +173,9 @@
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="FrustumVisualizer.h" />
     <ClInclude Include="GridVisualizer.h" />
+    <ClInclude Include="Model.h" />
+    <ClInclude Include="SimpleCamera.h" />
+    <ClInclude Include="Span.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Win32Application.h" />
   </ItemGroup>
@@ -180,7 +185,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="SceneShaders.hlsl">
+    <CustomBuild Include="MeshletPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
@@ -197,7 +202,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="PostShaders.hlsl">
+    <CustomBuild Include="MeshletMS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
@@ -213,6 +218,9 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <FileType>Document</FileType>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Dragon_LOD0.bin" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

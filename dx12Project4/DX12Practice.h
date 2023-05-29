@@ -1,7 +1,11 @@
 #pragma once
 
 #include "DXBaise.h"
-#include "Frustum.h"
+#include <Model.h>
+#include "SimpleCamera.h"
+#include "StepTimer.h"
+
+
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -14,6 +18,8 @@ public:
     virtual void OnUpdate();
     virtual void OnRender();
     virtual void OnDestroy();
+    virtual void OnKeyDown(UINT8 key);
+    virtual void OnKeyUp(UINT8 key);
 
 protected:
 
@@ -37,10 +43,28 @@ protected:
     bool m_enableUI;
 
 private:
-    static const UINT FrameCount = 2;
+    static const UINT FrameCount = 3;
     static const UINT TextureWidth = 256;
     static const UINT TextureHeight = 256;
     static const UINT TexturePixelSize = 4;    // The number of bytes used to represent a pixel in the texture.
+
+
+    static const UINT CityRowCount = 15;
+    static const UINT CityColumnCount = 8;
+    static const UINT CityMaterialCount = CityRowCount * CityColumnCount;
+    static const UINT CityMaterialTextureWidth = 64;
+    static const UINT CityMaterialTextureHeight = 64;
+    static const UINT CityMaterialTextureChannelCount = 4;
+    static const bool UseBundles = true;
+    static const float CitySpacingInterval;
+
+    _declspec(align(256u)) struct SceneConstantBuffer
+    {
+        XMFLOAT4X4 World;
+        XMFLOAT4X4 WorldView;
+        XMFLOAT4X4 WorldViewProj;
+        uint32_t   DrawMeshlets;
+    };
 
     struct Vertex
     {
@@ -55,7 +79,7 @@ private:
     ComPtr<ID3D12Device2> m_device;
     ComPtr<ID3D12Resource> m_depthStencil;
     ComPtr<ID3D12Resource> m_renderTargets[FrameCount];
-    ComPtr<ID3D12CommandAllocator> m_commandAllocator;
+    ComPtr<ID3D12CommandAllocator> m_commandAllocator[FrameCount];
     ComPtr<ID3D12CommandQueue> m_commandQueue;
     ComPtr<ID3D12RootSignature> m_rootSignature;
     ComPtr<ID3D12DescriptorHeap> m_rtvHeap;
@@ -63,7 +87,12 @@ private:
     ComPtr<ID3D12DescriptorHeap> m_dsvHeap;
     ComPtr<ID3D12PipelineState> m_pipelineState;
     ComPtr<ID3D12PipelineState> m_depthOnlyPipelineState;
-    ComPtr<ID3D12GraphicsCommandList1> m_commandList;
+
+    ComPtr<ID3D12GraphicsCommandList6> m_commandList;
+    SceneConstantBuffer m_constantBufferData;
+    UINT8* m_cbvDataBegin;
+
+    ComPtr<ID3D12Resource> m_constantBuffer;
     UINT m_rtvDescriptorSize;
     bool DepthBoundsTestSupported;
 
@@ -78,17 +107,27 @@ private:
 
     // Synchronization objects.
     UINT m_frameIndex;
+    UINT m_frameCounter;
     UINT m_frameNumber;
     HANDLE m_fenceEvent;
     ComPtr<ID3D12Fence> m_fence;
-    UINT64 m_fenceValue;
+    UINT64 m_fenceValues[FrameCount];
 
-    Frustum                  m_frustumDraw;
+    StepTimer m_timer;
+    SimpleCamera m_camera;
+    Model m_model;
+
 
     void LoadPipeline();
     void LoadAssets();
     void PopulateCommandList();
-    void WaitForPreviousFrame();
+    void MoveToNextFrame();
+    void WaitForGpu();
+
+private:
+    static const wchar_t* c_meshFilename;
+    static const wchar_t* c_meshShaderFilename;
+    static const wchar_t* c_pixelShaderFilename;
     
 };
 
